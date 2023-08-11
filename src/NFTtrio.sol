@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity 0.8.18;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {console} from "forge-std/Test.sol";
 
 contract NFTtrio is ERC721, ERC2981, Ownable2Step {
     uint256 public constant MAX_SUPPLY = 20;
@@ -15,20 +16,23 @@ contract NFTtrio is ERC721, ERC2981, Ownable2Step {
     bytes32 public immutable merkleRoot;
     uint256 public currentSupply;
 
-    address private _royaltyReceiver;
+    address private immutable _royaltyReceiver;
     uint256 private _royalties;
     BitMaps.BitMap private _discountList;
 
     constructor(bytes32 _merkleRoot, address royaltyReceiver) ERC721("NFTtrio", "NFT3") {
+        require(royaltyReceiver != address(0), "Invalid royalty receiver");
         _royaltyReceiver = royaltyReceiver;
         _setDefaultRoyalty(royaltyReceiver, ROYALTY);
         merkleRoot = _merkleRoot;
     }
 
     function mint() public payable {
-        require(msg.value == PRICE);
+        require(msg.value == PRICE, "Incorrect price");
         require(currentSupply < MAX_SUPPLY, "All tokens minted");
         require(balanceOf(msg.sender) < 2, "Only two NFTs per address");
+
+        console.log("currentSupply: %s", currentSupply);
 
         _safeMint(msg.sender, currentSupply);
 
@@ -39,7 +43,7 @@ contract NFTtrio is ERC721, ERC2981, Ownable2Step {
     }
 
     function mintWithDiscount(bytes32[] calldata proof, uint256 index) external payable {
-        require(msg.value == PRICE / 2);
+        require(msg.value == PRICE / 2, "Incorrect price");
         require(currentSupply < MAX_SUPPLY, "All tokens minted");
         require(balanceOf(msg.sender) < 2, "Only two NFTs per address");
         require(!BitMaps.get(_discountList, index), "Discount already used");
