@@ -6,7 +6,6 @@ import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import {console} from "forge-std/Test.sol";
 
 contract NFTtrio is ERC721, ERC2981, Ownable2Step {
     uint256 public constant MAX_SUPPLY = 20;
@@ -31,8 +30,6 @@ contract NFTtrio is ERC721, ERC2981, Ownable2Step {
         require(msg.value == PRICE, "Incorrect price");
         require(currentSupply < MAX_SUPPLY, "All tokens minted");
         require(balanceOf(msg.sender) < 2, "Only two NFTs per address");
-
-        console.log("currentSupply: %s", currentSupply);
 
         _safeMint(msg.sender, currentSupply);
 
