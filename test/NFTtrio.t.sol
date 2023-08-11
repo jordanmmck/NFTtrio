@@ -176,6 +176,20 @@ contract NFTtrioTest is Test {
         assertEq(address(0x99).balance, 0.2 ether * (1 - 0.025));
     }
 
+    function testWithdrawReservesNotOwner() public {
+        vm.startPrank(alice);
+        vm.deal(alice, 1 ether);
+        nfttrio.mint{value: 0.1 ether}();
+        nfttrio.mint{value: 0.1 ether}();
+        vm.stopPrank();
+
+        assertEq(address(nfttrio).balance, 0.2 ether);
+
+        vm.prank(alice);
+        vm.expectRevert("Ownable: caller is not the owner");
+        nfttrio.withdrawReserves();
+    }
+
     function testTransferOwnership() public {
         vm.startPrank(alice);
         vm.deal(alice, 1 ether);

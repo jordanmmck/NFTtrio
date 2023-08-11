@@ -111,8 +111,9 @@ contract NFTStaking is Test {
         nfttrio.safeTransferFrom(alice, address(staking), 0);
         assertEq(nfttrio.balanceOf(alice), 0);
 
+        vm.roll(REWARD_DELAY + 2);
+
         // withdraw NFT
-        vm.roll(REWARD_DELAY + 1);
         vm.prank(alice);
         staking.withdrawNFT(0);
         assertEq(nfttrio.balanceOf(alice), 1);

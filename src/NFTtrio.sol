@@ -40,7 +40,9 @@ contract NFTtrio is ERC721, ERC2981, Ownable2Step {
     }
 
     function mintWithDiscount(bytes32[] calldata proof, uint256 index) external payable {
-        require(msg.value == PRICE / 2, "Incorrect price");
+        uint256 discountedPrice = PRICE / DISCOUNT_FACTOR;
+
+        require(msg.value == discountedPrice, "Incorrect price");
         require(currentSupply < MAX_SUPPLY, "All tokens minted");
         require(balanceOf(msg.sender) < 2, "Only two NFTs per address");
         require(!BitMaps.get(_discountList, index), "Discount already used");
@@ -52,7 +54,7 @@ contract NFTtrio is ERC721, ERC2981, Ownable2Step {
 
         _safeMint(msg.sender, currentSupply);
 
-        (, uint256 royaltyAmount) = royaltyInfo(currentSupply, PRICE / DISCOUNT_FACTOR);
+        (, uint256 royaltyAmount) = royaltyInfo(currentSupply, discountedPrice);
         _royalties += royaltyAmount;
 
         currentSupply++;

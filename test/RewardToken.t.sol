@@ -22,6 +22,12 @@ contract RewardTokenTest is Test {
         assertEq(rewardToken.stakingAddress(), jordan);
     }
 
+    function testSetStakingAddressNotOwner() public {
+        vm.prank(alice);
+        vm.expectRevert("Ownable: caller is not the owner");
+        rewardToken.setStakingAddress(jordan);
+    }
+
     function testSetStakingAddressFailZeroAddr() public {
         vm.prank(jordan);
         vm.expectRevert("Zero address");

@@ -5,6 +5,7 @@ import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {RewardToken} from "./RewardToken.sol";
+import {console} from "forge-std/Test.sol";
 
 contract Staking is IERC721Receiver {
     struct Deposit {
@@ -58,8 +59,11 @@ contract Staking is IERC721Receiver {
 
             // use bools instead of require to avoid reverting the whole transaction
             if (isOwner && isReady) {
+                console.log("isOwner && isReady");
                 tokensOwing += 10 * 10 ** tokenDecimals;
                 _deposits[tokenIDs[i]].block = block.number;
+            } else {
+                console.log("not isOwner || not isReady");
             }
             unchecked {
                 i++;
@@ -80,6 +84,8 @@ contract Staking is IERC721Receiver {
         if (deposit.block + REWARD_DELAY <= block.number) {
             RewardToken rewardToken = RewardToken(tokenAddress);
             rewardToken.mintStakingRewards(msg.sender, 10 * 10 ** tokenDecimals);
+        } else {
+            console.log("not ready to collect tokens");
         }
     }
 }
